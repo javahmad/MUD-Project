@@ -34,3 +34,42 @@
 	text-align:center;
 	padding:10px;
 }
+.user-wrapper{
+	
+}
+.user-map{
+	background-color:#CCCCCC;
+	border:1px solid black;
+	height:450px;
+	width:240px;
+	padding:10px;
+	float:left;
+}
+.map{
+	background-color:white;
+	margin-left:10px;
+	margin-right:10px;
+}
+.user-space{
+	background-color:#CCCCCC;
+	height:450px;
+	width:560px;
+	border:1px solid black;
+	font:16px/26px Georgia;
+	overflow:auto;
+	margin-left:10px;
+	margin-right:10px;
+	float:left;
+}
+.adventure-log{
+	margin-left:10px;
+	float:left;
+}
+.user-inventory{
+	background-color:#CCCCCC;
+	border:1px solid black;
+	height:450px;
+	width:240px;
+	padding:10px;
+	float:left;
+}
