@@ -23,6 +23,7 @@
 				<div class="content">
 					<h1>Contact</h1>
 					<p>This is the Contact Page</p>
+					<p><strong>Created By:</strong> David Lane, Henry Curtis, Ahmad Elhamed</p>
 					<a href="index.php?page=index">Index</a>
 					<a href="index.php?page=contact">Contact</a>
 				</div>
