@@ -34,9 +34,14 @@
 		echo "The details are correct: ";
 		$_SESSION['loggedin'] = $username;
 		echo $_SESSION['loggedin'];
+		
+		header("refresh:2;url=../../index.php?page=index");
+		die();
 	}
 	else
 	{
-		echo "The details you entered are not found in the database";	
+		echo "The details you entered are not found in the database";
+		header("refresh:2;url=../../index.php?page=login");
+		die();	
 	}
 ?>
