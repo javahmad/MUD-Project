@@ -24,6 +24,9 @@
 			{
 				session_destroy();
 				echo "Logged Out";
+				
+				header("refresh:2;url=index.php?msg=logoutsuccess");
+				die();
 			}
 		}
 		else 
