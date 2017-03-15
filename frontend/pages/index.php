@@ -4,20 +4,22 @@
 	global $description;
 	global $logo;
 ?>
+<!DOCTYPE html>
 <html>
 	<head>
-		<title><?php echo $title.$seperator.$description; ?></title>
-		<link href = "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+		<title><?php echo $title.$seperator.$description ?></title>
+		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 		<meta charset="utf-8">
-	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
-	    <link href="frontend/design/css/bootstrap.min.css" rel="stylesheet">
-	    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-	    <link href="frontend/design/css/stylesheet.css" rel="stylesheet" type="text/css">
+		<meta http-equiv="X-UA-Compatible" content="IE-edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="frontend/design/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+		<link href="frontend/design/css/stylesheet.css" rel="stylesheet" type="text/css">	
+		<script type="text/javascript" src="system/scripts/jquery.js"></script>
 	</head>
 	
 	<body>
-		<div id = "wrapper">
+		<div id="wrapper">
 			<?php require_once("frontend/templates/header.php"); ?>
 			<div class="layer">
 				<div class="content">
@@ -32,22 +34,22 @@
 							{
 								$msg = "You have successfully logged in";
 							}
-							elseif($msg == "registersuccess")
+							if($msg == "registersuccess")
 							{
-								$msg = "You have successfully registered an account";
+								$msg = "You have successfully registered";
 							}
-							elseif($msg == "logoutsuccess")
+							if($msg == "logoutsuccess")
 							{
 								$msg = "You have successfully logged out";
 							}
-						}
+						} 
 						if(isset($_SESSION['loggedin']))
 						{
 							//DATABASE CONNECTION
-							$dbserver 		= "localhost";
-							$dbusername 	= "root";
-							$dbpassword 	= "";
-							$db 			= "mmorts";
+							$dbserver	= "localhost";
+							$dbusername	= "root";
+							$dbpassword	= "";
+							$db			= "mmorts";
 							
 							//CREATE CONNECTION
 							$conn = new mysqli($dbserver, $dbusername, $dbpassword, $db);
@@ -58,6 +60,7 @@
 								//KILL CONNECTION/ERROR MESSAGE
 								die("Connection Failed: ".$conn->connect_error);
 							}
+							
 							$username = $_SESSION['loggedin'];
 							
 							$query = "SELECT id FROM users WHERE username = '$username'";
@@ -72,47 +75,54 @@
 							$result = mysqli_query($conn, $query);
 							$row = mysqli_fetch_assoc($result);
 							
-							//USERDATA
+							//USERDATA INVENTORY
 							$user_inv = $row['name'];
 							
-							?>
+							?>	
 							<h3>Workspace</h3>
 							<div class="user-wrapper">
 								<div class="user-map">
-									<h4>Area Explored: </h4>
-									<div class="map">
-										<p> [o] [o] [o]</p>
-										<p> [o] [x] [o]</p>
-										<p> [o] [o] [o]</p>
-									</div>
-								</div>
-								<div class="user-space">
-									<div class="adventure-log">
-										<h2>Adventure Log</h2>
-										<p>The Adventure Begins!</p>
-										<p>Adventure</p>
-										<p><strong>Enter Your Command: </strong></p>
-									</div>
-									<form>
-										<div class="form-group">
-											<input type="text" class="form-control" id="commands" placeholder="> ">
-										</div>
-									</form>
-								</div>
-								<div class="user-inventory">
-									<h4>User Inventory</h4>
-									<p><?php echo $user_inv; ?></p>
-								</div>
+							 		<h4>Area Explored:</h4>
+							 		<div class="map">
+							 			<p>	[o] [o] [o]</p>
+								 		<p>	[o] [x] [o]</p>
+								 		<p>	[o] [o] [o]</p>	
+								 	</div>
+							 	</div>
+							 	
+							 	<div class="user-space">
+							 		<div id="adventure-log">
+							 			<h2><strong>Adventure Log</strong></h2>
+							 			<p id="message_startgame">The Adventure Begins!</p>
+							 			
+							 			<p id="area_northcorridor">You are in the north corridor </p>
+							 			
+							 			<p id="user_commands"></p>
+							 			
+							 			<p><span id="message_help" style="display:none;">List of Commands</span></p>
+							 			
+							 			<script type="text/javascript" src="system/scripts/game.js"></script>
+							 			
+							 			<div id="placeholder"></div>
+							 			<form onsubmit="return false;">
+											<input type="text" id="command_line" name="command_line">
+										</form>
+							 		</div>
+							 	</div>
+							 	
+							 	<div class="user-resources">
+							 		<h4>User Inventory:</h4>
+							 		<p><?php echo $user_inv; ?></p>
+							 	</div>
 							</div>
 							<?php
 						}
-					?>
-					
-					<a href="index.php?page=index">Index</a>
+						?>
+					<a href="index.php?page=index">Home</a>	
 					<a href="index.php?page=contact">Contact</a>
 				</div>
 			</div>
 			<?php require_once("frontend/templates/footer.php"); ?>
-		</div>
+		</div>	
 	</body>
 </html>
