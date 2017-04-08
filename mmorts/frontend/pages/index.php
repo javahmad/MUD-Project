@@ -16,6 +16,8 @@
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 		<link href="frontend/design/css/stylesheet.css" rel="stylesheet" type="text/css">	
 		<script type="text/javascript" src="system/scripts/jquery.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+							 			
 	</head>
 	
 	<body>
@@ -97,17 +99,15 @@
 							 			<h2><strong>Adventure Log</strong></h2>
 							 			<p id="message_startgame">
 							 				The Adventure Begins!
+							 				Let's start with creating your character. 
+							 				Type "create [class name] to" to create your character.
+							 				The available classes are: <strong>Warrior</strong>, 
+							 				<strong>Wizard</strong>, and <strong>Rogue</strong>.
+							 				For more info, type <strong>"info [classname]"</strong>. 
 							 			</p>							 			
-							 			<p id="room_description">
-							 				You are in the middle of a set of corriddors extending North, East, South, and West. 
-							 				There is a sword in the center of the room gathering dust. 			
-							 			</p>							 			
-							 			<p id="user_commands">
-							 				You can <strong>go</strong> in a <strong>direction</strong>, 
-							 				or you can <strong>take</strong> the <strong>sword</strong>.
-							 			</p>							 			
+							 															 			
 							 			<p id="help_command">
-							 				For a list of commands, you can type <strong>"-help"</strong> below. 
+							 				For a list of commands, you can type <strong>"-help"</strong> below.
 							 			</p>							 			
 							 			<p><span id="message_help" style="display:none;">
 						 					<strong>List of Commands: </strong>							 				
@@ -115,7 +115,9 @@
 						 					take [item] = take an item that is obtainable.
 						 					talk to [person] = talk to the person, if they can interact with you.		 				
 							 			</span></p>
+							 			<p id="room_description"></p>
 							 			
+							 			<script type="text/javascript" src="system/scripts/functions_and_variables.js"></script>
 							 			<script type="text/javascript" src="system/scripts/game.js"></script>
 							 			
 							 			<div id="placeholder"></div>
@@ -136,6 +138,7 @@
 						?>
 					<a href="index.php?page=index">Home</a>	
 					<a href="index.php?page=contact">Contact</a>
+					<a href="index.php?page=servertesting">Server</a>
 				</div>
 			</div>
 			<?php require_once("frontend/templates/footer.php"); ?>
