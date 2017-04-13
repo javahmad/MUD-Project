@@ -1,0 +1,317 @@
+/*  
+Copyright © 2016 Ahmad Elhamad
+So copy my homework...
+and make me rich! #USA
+*/
+   
+#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+
+
+#define STORAGE 255
+
+char c[STORAGE]; /* holds arguments , c[0] is command name */
+
+char *argv_copy[STORAGE]; // holds arguments
+char *pipe_one[STORAGE]; // holds arguments of first half of pipe
+char *pipe_two[STORAGE]; // holds arguments of second half of pipe
+
+int in_file = NULL;			// file descriptors
+int out_file = NULL;		//points to the in/out file in argv
+
+char *infile = '\0';		//file names
+char *outfile = '\0';		
+
+int infl_index= 0;      // stores index of in_file in argv_copy
+int outfl_index= 0;     //stores index of out_file in argv_copy
+
+int ampFLAG = 0;	//marks background processing
+int leftFLAG = 0;
+int rightFLAG = 0; 
+int pipeFLAG = 0; 
+int flags_out = O_CREAT | O_EXCL | O_RDWR;
+int flags_in = O_RDONLY;
+int pipe_count;
+int pipeLocation= 0;
+int pipe_indx[20];
+int ampersand_seen=0;
+int argcount;
+
+/****************************/ /* GETWORD.H/*/
+#include <stdio.h>
+#include <string.h>
+#include <strings.h>
+
+
+
+int getword(char *w);
+/****************************/
+int getword(char *w){
+	int charCounter = 0; //counts number of letters
+	int iochar; //variable for the char of stdin
+	char* ogw; //char point variable
+	ogw = w; //pointer to the original pointer *w to reference later
+	
+	while((iochar = getchar()) !=EOF){
+		if(iochar == 32 || iochar == 10){ //checks if newline or space
+			if(charCounter != 0){ //checks if counter is not zero
+				if(strcmp(ogw,"logout")==0){  //compares the string referencing the beginning of the passed in char array with the string "logout" 
+					*w = '\0';
+					return -1; //returns -1 if it works
+				}
+				if(iochar == '\n'){ //puts back newline into stdin
+					ungetc('\n',stdin); 
+					*w = '\0'; //finishes up the current string
+					return charCounter;
+				}
+				else{ //prints standard string 
+					*w = '\0';
+					return charCounter;
+				}
+			}
+			else if(iochar == 10 && charCounter == 0){ //handles a space followed by a newline, from input1
+				*w = '\0';
+				return 0;
+			}
+		}
+		else{ //places into the array
+			*w = iochar;
+			charCounter++;
+			*w++;
+		}
+	}
+	*w = '\0'; // handles premature EOF
+	if(charCounter == 0){
+		*w = '\0';
+		return -1;
+	}
+	return charCounter;
+}
+
+int parse() { // parses a command line, each argument in seperate slot
+	
+	int current; //current position in storage array
+	int offset = 0; // calculates offset
+	int num_words = 0; // counts words, increments every getword() return
+	int num_args=0;
+	int pipecount = 0; // counts pipes; error if >2
+	int count;		//return value of getword() indicates EOF or \n
+	
+	while( (count = getword(c + offset)) > 0 )
+		{
+			if(count == -2){
+				break;
+			}
+
+			if ( *(c + offset) == '|' )  //if we reach a pipe
+			{		
+				pipeFLAG=1;
+				argv_copy[num_args++] = (char *) NULL; //we dont put pipe as argument, Null Terminates that part of array,
+				pipeLocation = num_args; // stores index of piped command..... divides between 1st args and 2nd args
+				pipe_indx[pipe_count++] = pipeLocation; // store index of piped command (after '|')
+														// for later reference
+			}
+			
+			if ( *(c + offset) == '&' )
+			{	ampFLAG=1;
+				argv_copy[num_args++] = (char *) NULL;
+				continue;
+				
+			}		
+			if( *(c + offset) == '<' && count == 1)
+			{	
+				if(leftFLAG == 1){
+					fprintf(stderr," Only one input redirect allowed.");
+				}
+				leftFLAG++; 
+				infl_index = num_args; //save index
+				continue;
+				
+			}
+			else if( *(c + offset) == '>' && count == 1)
+			{	if(rightFLAG == 1){
+					fprintf(stderr,"Only one output redirect allowed");
+				}			
+				rightFLAG++;
+				outfl_index = num_args;
+				continue;
+			}
+		
+			else {
+			
+				argv_copy[num_args++] = c + offset; /*removed offset*/
+			}
+			
+			c[offset+count] = '\0';
+			offset = offset+count+1; //offset goes up one for every letter seen in word
+			num_words++;
+		}
+		
+		if(count == -1)
+		{	return count;
+		}
+				
+	argv_copy[num_args] = NULL;
+	return num_words;
+}
+	
+int main()
+{
+	int in_desc;        // file descriptor for input
+	int out_desc;       //file descriptor for output
+	char *argument[STORAGE];	//holds value for argument check *//
+	
+	
+/*	
+	printf("Enter your username: ");
+	char *user, *pass;
+	scanf("%c", &user);
+	printf("Enter your password: ");
+	scanf("%c", &pass);
+*/	
+	sleep(1);
+	printf("Validating complete! Logging in..");
+    sleep(2);
+	
+	struct Item
+	{	
+		char *desc;
+		int item_id;
+		char *name;	
+	};
+	struct Room
+	{
+		char* name;
+		char* weather;
+		int num_doors;
+		char *description; // prompts once on room entrance
+		struct Item items_room[5];
+		
+		int empty; // 1 = NO
+	};
+	struct Player
+	{
+		struct Item inventory; // player holds one item
+		char *name;			// for helo command
+	};
+	struct Room intro;
+	struct Item intro_item1;
+	struct Item intro_item2;			
+				intro.items_room[0] =  intro_item1; //1st item in room
+				intro.items_room[1] =  intro_item2; // 2nd item in room
+				strcpy(intro.name , "Introduction Room");
+				strcpy(intro.description , "This is the tutorial room! Explore the room w/ 'SHOW room'");
+				strcpy(intro.weather , "a bright and sunny day!!!");
+				intro.num_doors = 1; /* Intro => Harambes room */
+				strcpy(intro_item1.name, "Brass key");
+				strcpy(intro_item1.desc , " A key leading out of here...");
+				intro_item1.item_id = 777; /* when item id in inventory matches, new room can be entered */
+				strcpy(intro_item2.name , "potion");
+				strcpy(intro_item2.desc , "A rejuvenating solution...");
+				
+	struct Room mem;
+	struct Item plaq;
+				mem.items_room[0] = plaq;
+				strcpy(plaq.desc , " A tribute to a fallen hero who was taken protecting the future of tommorrow...");
+				plaq.item_id = 9999;
+				strcpy(plaq.name , "Gold-Engraved Plaque");
+				strcpy(mem.name ,  "Memorial Room");
+				strcpy(mem.description , "You have entered the memorial room. Bow your heads...");
+				strcpy(mem.weather , "gloomy and depressing...");
+				mem.num_doors = 1;
+				
+	struct Room cur_Room = intro;
+	
+	for(;;) 
+	{	
+		fflush(stderr); //clean out buffers for children
+		fflush(stdout); // to inherit after
+		argv_copy[0] = '\0';
+		argument[0] = '\0';
+		ampFLAG = leftFLAG = rightFLAG = pipeFLAG = 0;
+		int mark=0;
+		
+		printf("MyMUD: Enter your command: ");     //issue prompt
+		argcount = parse(); //parse command, store arg count value
+
+		
+		if(argcount == -1) { //if first word == EOF , break
+			break;
+		}				
+		if(argv_copy[0] == NULL && argcount == 0){
+			continue; // if line is empty, 
+		}
+		
+		//handle builtin commands and continue, OR
+		// if there is a command on line, begin processing them
+		
+		//setup redirection (w/ background children having 
+		//their stdin redirected to /dev/null
+		
+		if( (strcmp(argv_copy[0] , "show") == 0))
+		{ 
+			if( (strcmp(argv_copy[1], "friends") == 0)) {
+				char friends[6][20] ;/*{"l33tboi" , "Trumpindeeznuts", "Obamaplz" , "coolkidrpg"  , "all4harambe69" , "cheripy"  };
+				*/
+				strcpy(friends[0], "l33tboi");
+				strcpy(friends[1], "Trumpindeeznurs");
+				strcpy(friends[2], "Obamaplz");
+				strcpy(friends[3], "coolkidrpg" );
+				strcpy(friends[4], "all4harambe69");
+				strcpy(friends[5], "cheripie");
+				int i;
+				for( i =0; i < sizeof(friends); i++)
+				{	
+					printf("%c",friends[i]);
+				}
+						
+			if ( (strcmp(argv_copy[1], "inventory") == 0)) {
+				char strings[6][10];
+				strcpy(strings[0], "Club");
+				strcpy(strings[1], "Axe");
+				strcpy(strings[2], "Bucket");
+				strcpy(strings[3], "Hat" );
+				strcpy(strings[4], "Potion");
+				strcpy(strings[5], "Shield");
+				
+				printf("Your inventory: ");
+				int i;
+				for(i =0; i  <6 ; i++){
+					printf( "%c\n"  , strings[i] );
+				}
+			}
+			if ( (strcmp(argv_copy[1], "room") == 0))
+			{	
+				printf("%c",cur_Room.description);
+				
+				if( (strcmp(argv_copy[2] ,"item") == 0))
+				{		
+						for(i= 0; i<sizeof(cur_Room.items_room); i++ ){
+								printf("%c\n",cur_Room.items_room[i].name);
+						}
+				}
+			}
+			if( (strcmp(argv_copy[1] ,"player") == 0))
+			{	if( strcmp(cur_Room.name,"Memorial Room") == 0){
+				}
+				printf("The players: hi365  are in the room.");
+			}
+	}
+	
+	killpg( getpid(), SIGTERM ); // Terminate any children still running 
+								//BAD ARGS TO KILLPG CAN CRASH AUTOGRADER
+	printf("Game terminated....GOODBYE~! \n");
+	exit(0);
+
+	
+	}
+}
+}
